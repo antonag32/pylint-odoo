@@ -498,13 +498,23 @@ class TestModel(models.Model):
         var[1] = 'SELECT name FROM account WHERE id IN %(ids)s' % {'ids': tuple(ids)}
         self._cr.execute(var[1])
 
+        death_wish = f"SELECT * FROM TABLE WHERE SQLI = {self.name}"
+        self.env.cr.execute(death_wish)
+
+    def sql_injection_fstring(self):
+        self.env.cr.execute(f"SELECT * FROM TABLE WHERE SQLI = {self.name}")
+        self.env.cr.execute(f"SELECT * FROM TABLE WHERE SQLI = {'hello' + self.name}")
+        self.env.cr.execute(f"SELECT * FROM {self.name} WHERE SQLI = {'hello'}")
+
     def sql_no_injection_private_attributes(self, _variable, variable):
         # Skip sql-injection using private attributes
         self._cr.execute(
             "CREATE VIEW %s AS (SELECT * FROM res_partner)" % self._table)
+        self.env.cr.execute(f"CREATE VIEW {self._table} AS (SELECT * FROM res_partner)")
         # Real sql-injection cases
         self._cr.execute(
             "CREATE VIEW %s AS (SELECT * FROM res_partner)" % self.table)
+        self.env.cr.execute(f"CREATE VIEW {self.table} AS (SELECT * FROM res_partner)")
         self._cr.execute(
             "CREATE VIEW %s AS (SELECT * FROM res_partner)" % _variable)
         self._cr.execute(
@@ -526,12 +536,16 @@ class TestModel(models.Model):
                 self._group_by(),
             )
         )
+        self.env.cr.execute(
+            f"CREATE OR REPLACE VIEW {self._table} AS ({self._select()} {self._from()})"
+        )
 
     def sql_no_injection_constants(self):
         self.env.cr.execute("SELECT * FROM %s" % 'table_constant')
         self.env.cr.execute("SELECT * FROM {}".format('table_constant'))
         self.env.cr.execute(
             "SELECT * FROM %(table_variable)s" % {'table_variable': 'table_constant'})
+        self.env.cr.execute(f"SELECT * FROM TABLE WHERE SQLI = {'hello'}")
 
     def func(self, a):
         length = len(a)

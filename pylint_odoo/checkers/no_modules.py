@@ -441,6 +441,11 @@ class NoModuleChecker(misc.PylintOdooChecker):
         # sql.SQL or sql.Identifier is OK
         if self._is_psycopg2_sql(node):
             return True
+        if isinstance(node, astroid.FormattedValue):
+            if hasattr(node, 'value'):
+                return self._sqli_allowable(node.value)
+            if hasattr(node, 'values'):
+                return all(self._sqli_allowable(v) for v in node.values)
         if isinstance(node, astroid.Call):
             node = node.func
         # self._thing is OK (mostly self._table), self._thing() also because
@@ -489,6 +494,11 @@ class NoModuleChecker(misc.PylintOdooChecker):
             elif not self._sqli_allowable(node.right):
                 # execute("..." % self._table)
                 return True
+        elif isinstance(node, astroid.JoinedStr):
+            if hasattr(node, 'value'):
+                return self._sqli_allowable(node.value)
+            elif hasattr(node, 'values'):
+                return not all(self._sqli_allowable(v) for v in node.values)
 
             # Consider cr.execute('SELECT ' + operator + ' FROM table' + 'WHERE')"
             # node.repr_tree()

@@ -58,7 +58,7 @@ EXPECTED_ERRORS = {
     'print-used': 1,
     'redundant-modulename-xml': 1,
     'rst-syntax-error': 2,
-    'sql-injection': 21,
+    'sql-injection': 25,
     'str-format-used': 3,
     'translation-field': 2,
     'translation-required': 15,
@@ -431,6 +431,26 @@ class MainTest(unittest.TestCase):
         real_errors = pylint_res.linter.stats['by_msg']
         expected_errors = {}
         self.assertDictEqual(real_errors, expected_errors)
+
+    def test_145_check_sqli(self):
+        """Verify the linter is capable of finding SQL Injection vulnerabilities.
+        Includes 'normal' vulnerabilities using % or + operators as well as the newer
+        Formatted String. Related to https://github.com/OCA/pylint-odoo/issues/363"""
+        extra_params = [
+            '--disable=all',
+            '--enable=sql-injection'
+        ]
+        test_module = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+            'test_repo', 'broken_module'
+        )
+        path_modules = [os.path.join(test_module, 'models', 'broken_model.py')]
+        pylint_res = self.run_pylint(path_modules, extra_params)
+        real_errors = pylint_res.linter.stats['by_msg']
+        self.assertDictEqual(
+            real_errors,
+            {'sql-injection': EXPECTED_ERRORS['sql-injection']}
+        )
 
 
 if __name__ == '__main__':
