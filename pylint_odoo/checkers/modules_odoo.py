@@ -26,11 +26,6 @@ ODOO_MSGS = {
         'rst-syntax-error',
         settings.DESC_DFLT
     ),
-    'E%d02' % settings.BASE_OMODULE_ID: (
-        '%s error: %s',
-        'xml-syntax-error',
-        settings.DESC_DFLT
-    ),
     'E%d03' % settings.BASE_OMODULE_ID: (
         'Test folder imported in module %s',
         'test-folder-imported',
@@ -619,23 +614,6 @@ class ModuleChecker(misc.WrapperModuleChecker):
             if os.path.isfile(os.path.join(self.module_path, readme)):
                 return True
         return False
-
-    def _check_xml_syntax_error(self):
-        """Check if xml file there is syntax error
-        :return: False if exists errors and
-                 add list of errors in self.msg_args
-        """
-        self.msg_args = []
-        for xml_file in self.filter_files_ext('xml', relpath=True):
-            try:
-                self.parse_xml(os.path.join(self.module_path, xml_file),
-                               raise_if_error=True)
-            except etree.XMLSyntaxError as xmlsyntax_error:
-                self.msg_args.append((
-                    xml_file, str(xmlsyntax_error).strip('\n').replace('\n', '|')))
-        if self.msg_args:
-            return False
-        return True
 
     def _get_duplicate_xml_record_id(self, records):
         """Get duplicated records based on attribute id
