@@ -32,7 +32,6 @@ EXPECTED_ERRORS = {
     'duplicate-xml-record-id': 2,
     'external-request-timeout': 47,
     'file-not-used': 6,
-    'incoherent-interpreter-exec-perm': 3,
     'invalid-commit': 4,
     'license-allowed': 1,
     'manifest-author-string': 1,
@@ -78,11 +77,6 @@ EXPECTED_ERRORS = {
     'manifest-maintainers-list': 1,
     'test-folder-imported': 3,
 }
-
-if six.PY3:
-    EXPECTED_ERRORS['unnecessary-utf8-coding-comment'] = 19
-else:
-    EXPECTED_ERRORS['no-utf8-coding-comment'] = 7
 
 
 @contextmanager
@@ -169,7 +163,6 @@ class MainTest(unittest.TestCase):
         # Some messages can be excluded as they are only applied on certain
         # Odoo versions (not necessarily 8.0).
         excluded_msgs = {
-            'unnecessary-utf8-coding-comment',
             'xml-deprecated-qweb-directive',
         }
         extra_params = ['--valid_odoo_versions=8.0']
@@ -270,20 +263,6 @@ class MainTest(unittest.TestCase):
             'manifest-version-format': 5,
         }
         self.assertDictEqual(real_errors, expected_errors)
-
-    @unittest.skipIf(not six.PY3, "unnecessary-utf8-coding-comment "
-                     "disabled directly from py2")
-    def test_100_read_version_from_manifest(self):
-        """Test the functionality to get the version from the file manifest
-        to avoid the parameter --valid_odoo_versions"""
-        modules = [mod for mod in self.paths_modules if
-                   'eleven_module' in mod or 'twelve_module' in mod]
-        extra_params = ['--disable=all', '--enable=no-utf8-coding-comment,'
-                        'unnecessary-utf8-coding-comment']
-        pylint_res = self.run_pylint(modules, extra_params)
-        real_errors = pylint_res.linter.stats.by_msg
-        self.assertListEqual(list(real_errors.items()),
-                             list([('unnecessary-utf8-coding-comment', 2)]))
 
     def test_110_manifest_required_authors(self):
         """ Test --manifest_required_authors using a different author and
