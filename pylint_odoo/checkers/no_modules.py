@@ -210,11 +210,6 @@ ODOO_MSGS = {
         'development-status-allowed',
         settings.DESC_DFLT
     ),
-    'R%d10' % settings.BASE_NOMODULE_ID: (
-        'Method defined with old api version 7',
-        'old-api7-method-defined',
-        settings.DESC_DFLT
-    ),
     'W%d11' % settings.BASE_NOMODULE_ID: (
         'Field parameter "%s" is no longer supported. Use "%s" instead.',
         'renamed-field-parameter',
@@ -916,7 +911,7 @@ class NoModuleChecker(misc.PylintOdooChecker):
 
     @utils.check_messages('api-one-multi-together',
                           'copy-wo-api-one', 'api-one-deprecated',
-                          'method-required-super', 'old-api7-method-defined',
+                          'method-required-super',
                           'missing-return',
                           )
     def visit_functiondef(self, node):
@@ -953,13 +948,6 @@ class NoModuleChecker(misc.PylintOdooChecker):
             if 'super' not in calls:
                 self.add_message('method-required-super', node=node,
                                  args=(node.name))
-
-        if self.linter.is_message_enabled('old-api7-method-defined'):
-            first_args = [arg.name for arg in node.args.args][:3]
-            if len(first_args) == 3 and first_args[0] == 'self' and \
-               first_args[1] in ['cr', 'cursor'] and \
-               first_args[2] in ['uid', 'user', 'user_id']:
-                self.add_message('old-api7-method-defined', node=node)
 
         there_is_super = False
         for stmt in node.nodes_of_class(astroid.Call):

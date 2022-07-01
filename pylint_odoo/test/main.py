@@ -48,7 +48,6 @@ EXPECTED_ERRORS = {
     'missing-readme': 1,
     'missing-return': 1,
     'odoo-addons-relative-import': 4,
-    'old-api7-method-defined': 2,
     'openerp-exception-warning': 3,
     'po-syntax-error': 2,
     'po-msgstr-variables': 6,
