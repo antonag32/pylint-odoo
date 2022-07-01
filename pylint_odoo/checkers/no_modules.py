@@ -71,8 +71,8 @@ ODOO_MSGS = {
 
     'R%d01' % settings.BASE_NOMODULE_ID: (
         'Import `Warning` should be renamed as UserError '
-        '`from openerp.exceptions import Warning as UserError`',
-        'openerp-exception-warning',
+        '`from odoo.exceptions import Warning as UserError`',
+        'odoo-exception-warning',
         settings.DESC_DFLT
     ),
     'W%d01' % settings.BASE_NOMODULE_ID: (
@@ -973,12 +973,12 @@ class NoModuleChecker(misc.PylintOdooChecker):
             for name, alias in node.names
         })
 
-    @utils.check_messages('openerp-exception-warning', 'external-request-timeout')
+    @utils.check_messages('odoo-exception-warning', 'external-request-timeout')
     def visit_importfrom(self, node):
-        if node.modname == 'openerp.exceptions':
+        if node.modname == 'odoo.exceptions':
             for (import_name, import_as_name) in node.names:
                 if import_name == 'Warning' and import_as_name != 'UserError':
-                    self.add_message('openerp-exception-warning', node=node)
+                    self.add_message('odoo-exception-warning', node=node)
         self._from_imports.update({
             alias or name: "%s.%s" % (node.modname, name)
             for name, alias in node.names})

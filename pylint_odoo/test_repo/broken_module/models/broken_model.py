@@ -37,7 +37,7 @@ from serial import Serial
 from serial import Serial as Serial_r
 
 from openerp import fields, models, _
-from openerp.exceptions import Warning as UserError
+from odoo.exceptions import Warning as UserError
 from openerp import exceptions
 
 # Relatives import for odoo addons
