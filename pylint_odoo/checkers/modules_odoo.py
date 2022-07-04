@@ -101,14 +101,6 @@ ODOO_MSGS = {
         'file-not-used',
         settings.DESC_DFLT
     ),
-    'W%d35' % settings.BASE_OMODULE_ID: (
-        'External dependency "%s" without ImportError. More info: '
-        'https://github.com/OCA/odoo-community.org/blob/master/website/'
-        'Contribution/CONTRIBUTING.rst'
-        '#external-dependencies',
-        'missing-import-error',
-        settings.DESC_DFLT
-    ),
     'W%d36' % settings.BASE_OMODULE_ID: (
         'Missing external dependency "%s" from manifest. More info: '
         'https://github.com/OCA/odoo-community.org/blob/master/website/'
@@ -244,12 +236,6 @@ class ModuleChecker(misc.WrapperModuleChecker):
                 DFLT_DEPRECATED_TREE_ATTRS)
         }),
     )
-
-    odoo_check_versions = {
-        'missing-import-error': {
-            'max_odoo_version': '11.0',
-        },
-    }
 
     class_inherit_names = []
 
@@ -417,21 +403,20 @@ class ModuleChecker(misc.WrapperModuleChecker):
         if import_category not in ('FIRSTPARTY', 'THIRDPARTY'):
             # skip if is not a external library or is a white list library
             return
+
         relpath = os.path.relpath(
-            node.parent.file, os.path.dirname(self.manifest_file))
+            node.parent.file, os.path.dirname(self.manifest_file)
+        )
         if os.path.dirname(relpath) == 'tests':
             # import errors rules don't apply to the test files
             # since these files are loaded only when running tests
             # and in such a case your
             # module and their external dependencies are installed.
             return
-        self.add_message('missing-import-error', node=node,
-                         args=(module_name,))
-
-        ext_deps = self.manifest_dict.get('external_dependencies') or {}
-        py_ext_deps = ext_deps.get('python') or []
         if isinstance(node, astroid.ImportFrom) and (node.level or 0) >= 1:
             return
+        ext_deps = self.manifest_dict.get('external_dependencies') or {}
+        py_ext_deps = ext_deps.get('python') or []
         if module_name not in py_ext_deps and \
                 module_name.split('.')[0] not in py_ext_deps and \
                 not any(dep in module_name for dep in py_ext_deps):
@@ -439,7 +424,6 @@ class ModuleChecker(misc.WrapperModuleChecker):
                              args=(module_name,))
 
     @utils.check_messages('odoo-addons-relative-import',
-                          'missing-import-error',
                           'missing-manifest-dependency',
                           'test-folder-imported')
     def visit_importfrom(self, node):
@@ -450,7 +434,6 @@ class ModuleChecker(misc.WrapperModuleChecker):
             self._check_imported_packages(node, package)
 
     @utils.check_messages('odoo-addons-relative-import',
-                          'missing-import-error',
                           'missing-manifest-dependency',
                           'test-folder-imported')
     def visit_import(self, node):

@@ -43,7 +43,6 @@ EXPECTED_ERRORS = {
     'method-inverse': 1,
     'method-required-super': 8,
     'method-search': 1,
-    'missing-import-error': 7,
     'missing-manifest-dependency': 5,
     'missing-readme': 1,
     'missing-return': 1,
@@ -286,23 +285,6 @@ class MainTest(unittest.TestCase):
                 EXPECTED_ERRORS['manifest-required-author']),
         }
         self.assertDictEqual(real_errors, expected_errors_deprecated)
-
-    def test_120_import_error_skip(self):
-        """Missing import error skipped for >=12.0"""
-        extra_params = [
-            '--valid_odoo_versions=11.0',
-            '--disable=all',
-            '--enable=missing-import-error',
-        ]
-        pylint_res = self.run_pylint(self.paths_modules, extra_params)
-        real_errors_110 = pylint_res.linter.stats.by_msg
-        self.assertEqual(self.expected_errors.get('missing-import-error'),
-                         real_errors_110.get('missing-import-error'))
-
-        extra_params[0] = '--valid_odoo_versions=12.0'
-        pylint_res = self.run_pylint(self.paths_modules, extra_params)
-        real_errors_120 = pylint_res.linter.stats.by_msg
-        self.assertFalse(real_errors_120)
 
     def test_130_odoo_namespace_repo(self):
         extra_params = [
