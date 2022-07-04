@@ -59,7 +59,6 @@ EXPECTED_ERRORS = {
     'translation-contains-variable': 10,
     'translation-positional-used': 5,
     'use-vim-comment': 1,
-    'wrong-tabs-instead-of-spaces': 2,
     'eval-referenced': 5,
     'except-pass': 3,
     'attribute-string-redundant': 33,

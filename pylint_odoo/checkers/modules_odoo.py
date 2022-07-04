@@ -62,11 +62,6 @@ ODOO_MSGS = {
         'redundant-modulename-xml',
         settings.DESC_DFLT
     ),
-    'W%d10' % settings.BASE_OMODULE_ID: (
-        '%s Use wrong tabs indentation instead of four spaces',
-        'wrong-tabs-instead-of-spaces',
-        settings.DESC_DFLT
-    ),
     'R%d80' % settings.BASE_OMODULE_ID: (
         'Consider merging classes inherited to "%s" from %s.',
         'consider-merging-classes-inherited',
@@ -862,27 +857,6 @@ class ModuleChecker(misc.WrapperModuleChecker):
             if openerp_nodes:
                 lineno = openerp_nodes[0].sourceline
                 self.msg_args.append(("%s:%s" % (xml_file, lineno)))
-        if self.msg_args:
-            return False
-        return True
-
-    def _check_wrong_tabs_instead_of_spaces(self):
-        """Check wrong tabs character instead of four spaces.
-        :return: False if exists errors and
-                 add list of errors in self.msg_args
-        """
-        self.msg_args = []
-        for type_file in self.config.extfiles_to_lint:
-            for ext_file_rel in self.filter_files_ext(type_file, relpath=True):
-                ext_file = os.path.join(self.module_path, ext_file_rel)
-                countline = 0
-                with open(ext_file, 'rb') as fp:
-                    for line in fp:
-                        countline += 1
-                        line_space_trip = line.lstrip(b' ')
-                        if line_space_trip != line_space_trip.lstrip(b'\t'):
-                            self.msg_args.append(
-                                ("%s:%d" % (ext_file_rel, countline)))
         if self.msg_args:
             return False
         return True
