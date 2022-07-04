@@ -21,11 +21,6 @@ ODOO_MSGS = {
         'missing-readme',
         settings.DESC_DFLT
     ),
-    'E%d01' % settings.BASE_OMODULE_ID: (
-        '%s %s',
-        'rst-syntax-error',
-        settings.DESC_DFLT
-    ),
     'E%d03' % settings.BASE_OMODULE_ID: (
         'Test folder imported in module %s',
         'test-folder-imported',
@@ -558,35 +553,6 @@ class ModuleChecker(misc.WrapperModuleChecker):
                     self.msg_args.append((
                         po_fname_linenum, "Translation string couldn't be parsed "
                         "correctly using string.format() %s" % str_parse_exc))
-
-    def _check_rst_syntax_error(self):
-        """Check if rst file there is syntax error
-        :return: False if exists errors and
-                 add list of errors in self.msg_args
-        """
-        rst_files = self.filter_files_ext('rst')
-        self.msg_args = []
-        for rst_file in rst_files:
-            errors = self.check_rst_syntax(
-                os.path.join(self.module_path, rst_file))
-            for error in errors:
-                msg = error.full_message
-                res = re.search(
-                    r'No directive entry for "([\w|\-]+)"|'
-                    r'Unknown directive type "([\w|\-]+)"|'
-                    r'No role entry for "([\w|\-]+)"|'
-                    r'Unknown interpreted text role "([\w|\-]+)"', msg)
-                # TODO: Add support for sphinx directives after fix
-                # https://github.com/twolfson/restructuredtext-lint/issues/29
-                if res:
-                    # Skip directive errors
-                    continue
-                self.msg_args.append((
-                    "%s:%d" % (rst_file, error.line or 0),
-                    msg.strip('\n').replace('\n', '|')))
-        if self.msg_args:
-            return False
-        return True
 
     def _check_missing_readme(self):
         """Check if exists ./README.{rst,md,txt} file

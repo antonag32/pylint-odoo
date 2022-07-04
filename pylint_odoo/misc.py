@@ -28,7 +28,6 @@ except ImportError:
             # Compatibility with pylint<=2.6.0
             from pylint.utils import (
                 _basename_in_blacklist_re as _is_in_ignore_list_re)
-from restructuredtext_lint import lint_file as rst_lint
 from six import string_types
 
 from . import settings
@@ -436,13 +435,6 @@ class WrapperModuleChecker(PylintOdooChecker):
                 if method_called in skips and fname in fnames:
                     fnames.remove(fname)
         return fnames
-
-    def check_rst_syntax(self, fname):
-        """Check syntax in rst files.
-        :param fname: String with file name path to check
-        :return: Return list of errors.
-        """
-        return rst_lint(fname, encoding='UTF-8')
 
     def npm_which_module(self, module):
         module_bin = which(module)
