@@ -181,16 +181,6 @@ class MainTest(unittest.TestCase):
         self.expected_errors.pop('dangerous-filter-wo-user')
         self.assertEqual(self.expected_errors, real_errors)
 
-    def test_40_deprecated_modules(self):
-        """Test deprecated modules"""
-        extra_params = ['--disable=all',
-                        '--enable=deprecated-module',
-                        '--deprecated-modules=openerp.osv']
-        pylint_res = self.run_pylint(self.paths_modules, extra_params)
-        real_errors = pylint_res.linter.stats.by_msg
-        self.assertListEqual(list(real_errors.items()),
-                             list([('deprecated-module', 4)]))
-
     def test_50_ignore(self):
         """Test --ignore parameter """
         extra_params = ['--ignore=test_module/res_users.xml',
