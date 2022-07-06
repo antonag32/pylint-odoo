@@ -105,11 +105,6 @@ ODOO_MSGS = {
         'except-pass',
         settings.DESC_DFLT
     ),
-    'W%d37' % settings.BASE_OMODULE_ID: (
-        '%s The xml attribute is missing the translation="off" tag %s',
-        'xml-attribute-translatable',
-        settings.DESC_DFLT
-    ),
     'W%d42' % settings.BASE_OMODULE_ID: (
         '%s Deprecated <tree> xml attribute "%s"',
         'xml-deprecated-tree-attribute',
@@ -913,24 +908,6 @@ class ModuleChecker(misc.WrapperModuleChecker):
         ]
         self.msg_args = no_referenced_files
         return not no_referenced_files
-
-    def _check_xml_attribute_translatable(self):
-        """The xml attribute is missing the translation="off" tag
-            Example  <attribute name="groups">sale.group</attribute>
-        """
-        if (self.linter._all_options['valid_odoo_versions'].config
-                .valid_odoo_versions != ['8.0']):
-            return True
-        self.msg_args = []
-        for xml_file in self.filter_files_ext('xml', relpath=True):
-            for record in self.get_xml_records(
-                    os.path.join(self.module_path, xml_file), None,
-                    '//attribute[not(@name="string") and not(@translation)]'):
-                self.msg_args.append(
-                    ("%s:%d" % (xml_file, record.sourceline), 'xml_id'))
-        if self.msg_args:
-            return False
-        return True
 
     def _check_xml_deprecated_tree_attribute(self):
         """The tree-view declaration is using a deprecated attribute.

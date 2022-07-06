@@ -226,22 +226,12 @@ class MainTest(unittest.TestCase):
 
     def test_90_valid_odoo_versions(self):
         """Test --valid_odoo_versions parameter when it's '8.0' & '11.0'"""
-        # First, run Pylint for version 8.0
+        # Run Pylint for version 11.0
         extra_params = [
-            '--valid_odoo_versions=8.0',
+            '--valid_odoo_versions=11.0',
             '--disable=all',
             '--enable=xml-attribute-translatable,manifest-version-format',
         ]
-        pylint_res = self.run_pylint(self.paths_modules, extra_params)
-        real_errors = pylint_res.linter.stats.by_msg
-        expected_errors = {
-            'manifest-version-format': 6,
-            'xml-attribute-translatable': 1,
-        }
-        self.assertDictEqual(real_errors, expected_errors)
-
-        # Now for version 11.0
-        extra_params[0] = '--valid_odoo_versions=11.0'
         pylint_res = self.run_pylint(self.paths_modules, extra_params)
         real_errors = pylint_res.linter.stats.by_msg
         expected_errors = {
